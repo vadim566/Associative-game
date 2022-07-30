@@ -1,13 +1,17 @@
 # This is a sample Python script.
+
 import threading
 import socket
-from mysql.connector import connect
+
 
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
-IP='localhost'
-PORT=5000
+
+
+#WEB SERVER
+SERVER_IP='localhost'
+SERVER_PORT=5000
 BUFFERSIZE=4*1024
 HTTP_HEAD='HTTP /1.0 200 OK\n\n'
 def client_respond(cSoc,cAdd):
@@ -34,12 +38,12 @@ def client_respond(cSoc,cAdd):
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     with  socket.socket(socket.AF_INET,socket.SOCK_STREAM) as socket:
-        socket.bind((IP,PORT))
-        print("ip and port bounded")
+        socket.bind((SERVER_IP,SERVER_PORT))
+        print(f"ip and port bounded\n The Server runs on {SERVER_IP} : {SERVER_PORT}")
         socket.listen()
         while True:
             cSoc, cAdd=socket.accept()
             threading.Thread(target=client_respond,args=(cSoc,cAdd)).start()
-
+        print(f"The server closed successfully")
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

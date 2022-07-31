@@ -2,18 +2,11 @@ import sys
 from mysql.connector import connect
 import names
 import random
-"""
+
 DB_HOST_IP = sys.argv[1]
 DB_NAME = sys.argv[2]
 USERNAME = sys.argv[3]
 PASSWORD = sys.argv[4]
-DB_HOST_PORT=3306
-"""
-#DB init
-DB_HOST_IP = 'localhost'
-DB_NAME = 'test1'
-USERNAME = 'root'
-PASSWORD = '@yq5xr19W'
 DB_HOST_PORT=3306
 
 global cursor

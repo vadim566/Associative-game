@@ -37,8 +37,8 @@ rare marbles, exquisitely polished.
 
 ## architecture and use case
 [![Architercture.png](https://i.postimg.cc/PxhWp824/Architercture.png)](https://postimg.cc/4KL7jnC7)
-###Case 1: The user will request to visualize a story from story list and it will processed by Master-Worker Zookeeper topology and will returned as visualized story
-###Case 2: The user will search an image and the request will be processed by master search of IDF-TF algorithms 
+### Case 1: The user will request to visualize a story from story list and it will processed by Master-Worker Zookeeper topology and will returned as visualized story
+### Case 2: The user will search an image and the request will be processed by master search of IDF-TF algorithms 
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.

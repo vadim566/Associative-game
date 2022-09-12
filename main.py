@@ -1,49 +1,36 @@
-# This is a sample Python script.
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Jul 12 11:02:06 2020
 
-import threading
-import socket
+@author: OHyic
 
+"""
+#Import libraries
+import os
+from GoogleImageScrapper import GoogleImageScraper
+from patch import webdriver_executable
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+if __name__ == "__main__":
+    #Define file path
+    webdriver_path = os.path.normpath(os.path.join(os.getcwd(), 'webdriver', webdriver_executable()))
+    image_path = os.path.normpath(os.path.join(os.getcwd(), 'photos'))
 
+    #Add new search key into array ["cat","t-shirt","apple","orange","pear","fish"]
+    search_keys= ['Glinda, the good Sorceress of Oz, sat in the grand court of her','palace, surrounded by her maids of honor--a hundred of the most'\
+                 ,'beautiful girls of the Fairyland of Oz','The palace court was built of\
+rare marbles', 'exquisitely polished' ]
 
+    #Parameters
+    number_of_images = 2
+    headless = False
+    min_resolution=(0,0)
+    max_resolution=(9999,9999)
 
-#WEB SERVER
-SERVER_IP='localhost'
-SERVER_PORT=5000
-BUFFERSIZE=4*1024
-HTTP_HEAD='HTTP /1.0 200 OK\n\n'
-def client_respond(cSoc,cAdd):
-    with cSoc as soc:
-            data=soc.recv(BUFFERSIZE)
-            if not data:
-                print(f"connection close with {cAdd}")
-                return
-            else:
-                route=data.decode().splitlines()[0].split(' ')[1]
-                if route=='/hello':#hello route
-                    body="<HTML><body><h1>u got the hello page</h1></body></HTML>"
-                elif  route =='/home':#home route
-                    body="<HTML><body><h1>u got the home page</h1></body></HTML>"
-                else:#another routes
-                        body = "<HTML><body><h1>There is no such page, try hello or home</h1></body></HTML>"
-                response=HTTP_HEAD+body
-                soc.sendall(response.encode())
-
-
-
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    with  socket.socket(socket.AF_INET,socket.SOCK_STREAM) as socket:
-        socket.bind((SERVER_IP,SERVER_PORT))
-        print(f"ip and port bounded\n The Server runs on {SERVER_IP} : {SERVER_PORT}")
-        socket.listen()
-        while True:
-            cSoc, cAdd=socket.accept()
-            threading.Thread(target=client_respond,args=(cSoc,cAdd)).start()
-        print(f"The server closed successfully")
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    #Main program
+    for search_key in search_keys:
+        image_scrapper = GoogleImageScraper(webdriver_path,image_path,search_key,number_of_images,headless,min_resolution,max_resolution)
+        image_urls = image_scrapper.find_image_urls()
+        image_scrapper.save_images(image_urls)
+    
+    #Release resources    
+    del image_scrapper

@@ -71,7 +71,9 @@ class LeaderElection():
 
     def is_leader(self) -> bool:
         return self._leader
-
+    def get_children(self):
+        children = self.zk.get_children(path=self.electionNamespace)
+        return children
     def __repr__(self):
         return 'Leader ' if self._leader is True else '' + self.nodeName + '(' + self.znode_name + ')'
 

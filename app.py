@@ -1,4 +1,5 @@
 import kazoo.client
+import requests
 from flask import Flask, url_for, redirect,request
 from leader_election import LeaderElection
 from kazoo.client import KazooClient, KazooState
@@ -13,23 +14,42 @@ app = Flask(__name__)
 
 le = LeaderElection('localhost:2181', 'Game', '/election')
 le.register()
+hostname=""
 
 
-if le.is_leader():
-    @app.route("/")
-    @app.route("/<term>")
-    def main(phrase="david"):
+
+def work_to_do(phrase,ip_sufix):
+    x=int(hostname[-1])
+    x=str(x+ip_sufix+1)
+    address = hostname[:-1]+str(x)+":5000"+"/"+phrase
+
+    x=requests.request(method='get',url="http://"+address)
+
+    return x.text
+
+
+
+@app.route("/" ,methods=['get','post'])
+
+
+def main(term="david"):
+    if le.is_leader():
         # if leader
-        msg = ('I am Leader\n')
+        msg=[]
+        msg.append('I am Leader\n')
+        for i in range(2):
+            msg.append(work_to_do(term,i))
         return msg
+    else:
+        return "i am worker waiting for work"
 
-else:
-    @app.route("/")
-    @app.route("/<term>")
-    def worker(term=""):
-
-            msg = ('I am Worker\n')
-            return msg
+@app.route("/<term>", methods=['get', 'post'])
+def worker(term=""):
+    if not le.is_leader():
+        msg = ('I am Worker'+term+'\n')
+        return msg
+    else:
+        redirect("/")
 
 
 
@@ -44,12 +64,16 @@ def ping_host(hostname,ip_range=1):
 
 if __name__=="__main__":
     if le.is_leader():
+        hostname = "127.0.0.1"
         app.run()
+
     else:
         children=le.get_children()
         num_of_children=len(children)
         ip_sufix=ping_host("127.0.0.1",num_of_children)
-        app.run(host="127.0.0."+str(ip_sufix))
+        hostname="127.0.0."+str(ip_sufix)
+        app.run(host=hostname)
+
 
 
 

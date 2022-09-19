@@ -1,3 +1,6 @@
+import random
+import time
+
 import kazoo.client
 import requests
 from flask import Flask, url_for, redirect,request
@@ -11,9 +14,14 @@ import pyping2
 app = Flask(__name__)
 
 
+#answer = LeaderElection('localhost:2181', 'Term', '/TF-IDF')
 
-le = LeaderElection('localhost:2181', 'Game', '/election')
+le = LeaderElection('localhost:2181', 'Leader', '/election')
 le.register()
+if le.is_leader():
+    answer = LeaderElection('localhost:2181', 'Answer', '/answer')
+    answer.register()
+
 hostname=""
 
 
@@ -28,28 +36,46 @@ def work_to_do(phrase,ip_sufix):
     return x.text
 
 
+if le.is_leader():
+    @app.route("/" ,methods=['get','post'])
+    @app.route("/<term>", methods=['get', 'post'])
 
-@app.route("/" ,methods=['get','post'])
+    def main(term="david"):
+
+            # if leader
+            #msg=[]
+            #msg.append('I am Leader\n')
+           # for i in range(2):
+            #    msg.append(work_to_do(term,i))
+            #return msg
+
+            le.set_children_data(term)
+            time.sleep(5)
+            values=answer.get_children_data()
+            values=set(values)
+            le.set_children_data("")
+            answer.clean_zookeeper("/answer")
+            return str(values)
+     #   else:
+      #  return "i am worker waiting for work"
 
 
-def main(term="david"):
-    if le.is_leader():
-        # if leader
-        msg=[]
-        msg.append('I am Leader\n')
-        for i in range(2):
-            msg.append(work_to_do(term,i))
-        return msg
-    else:
-        return "i am worker waiting for work"
 
-@app.route("/<term>", methods=['get', 'post'])
-def worker(term=""):
-    if not le.is_leader():
-        msg = ('I am Worker'+term+'\n')
-        return msg
-    else:
-        redirect("/")
+if not le.is_leader():
+    le.set_data_self("")
+    while True:
+        time.sleep(2)
+        if not le.get_data_self()[0]==b"":
+                msg=le.get_data_self()[0]
+                x=random.randint(1,6)
+                term=str(msg)+str(x)
+               # le.set_data_self(term)
+                answer = LeaderElection('localhost:2181', 'answer', '/answer')
+                answer.register()
+                answer.set_data_self(term)
+                le.set_data_self("")
+              #  answer = LeaderElection('localhost:2181', 'term', '/TF-IDF')
+              #   answer.register()
 
 
 
@@ -67,12 +93,12 @@ if __name__=="__main__":
         hostname = "127.0.0.1"
         app.run()
 
-    else:
-        children=le.get_children()
-        num_of_children=len(children)
-        ip_sufix=ping_host("127.0.0.1",num_of_children)
-        hostname="127.0.0."+str(ip_sufix)
-        app.run(host=hostname)
+   # else:
+    #    children=le.get_children()
+     #   num_of_children=len(children)
+      #  ip_sufix=ping_host("127.0.0.1",num_of_children)
+       # hostname="127.0.0."+str(ip_sufix)
+        #app.run(host=hostname)
 
 
 

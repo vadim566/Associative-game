@@ -66,16 +66,42 @@ class LeaderElection():
                         print("Event is " + str(event))
                         self.elect_leader()
 
-    def clean_zookeeper(self):
-        self.zk.delete(self.electionNamespace, recursive=True)
+    def clean_zookeeper(self,path=""):
+        if(path==""):
+            path=self.electionNamespace
+
+        self.zk.delete(path, recursive=True)
 
     def is_leader(self) -> bool:
         return self._leader
+
     def get_children(self):
         children = self.zk.get_children(path=self.electionNamespace)
         return children
+
     def __repr__(self):
         return 'Leader ' if self._leader is True else '' + self.nodeName + '(' + self.znode_name + ')'
+
+    def set_children_data(self,term):
+        children=self.zk.get_children(path=self.electionNamespace)
+        for child in children:
+            self.zk.set(path=self.electionNamespace+"/"+child,value=term.encode('utf-8'))
+
+
+    def get_children_data(self,path=""):
+        if path=="":
+            path= self.electionNamespace
+        values=[]
+        children = self.zk.get_children(path=path)
+        for child in children:
+            values.append(self.zk.get(path=path + "/" + child)[0])
+        return values
+    def set_data_self(self,term):
+        self.zk.set(path=self.electionNamespace+"/"+self.znode_name,value=term.encode('utf-8'))
+    def get_data_self(self):
+        value=self.zk.get(path=self.electionNamespace+"/"+self.znode_name)
+        return  value
+
 
 
 if __name__ == '__main__':

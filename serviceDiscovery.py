@@ -1,7 +1,7 @@
 import threading
 from kazoo.client import KazooClient,KazooState
 import socket
-
+import  requests
 def connection_status_listener(state):
     if state == KazooState.LOST:
         print('session to zookeeper was lost')
@@ -39,5 +39,8 @@ class ServiceDiscovery():
         self.zk.close()
 
     def get_services(self):
-        if
-        return self.services
+        self.my_lock.acquire()
+        body_data=requests.request(method='get',url='http://'+self.services[0]+":5000")
+        self.my_lock.release()
+        return body_data
+

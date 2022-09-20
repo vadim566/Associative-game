@@ -21,9 +21,12 @@ class ServiceDiscovery():
         self.SERVICE_REGISTRY_NAMESPACE='/services'
         self.ZNODE_PREFIX='s_'
 
-    def register(self,service:str):
+    def register(self,service:str,ip):
         hostname=socket.gethostname()
-        my_ip : str =socket.gethostname('localhost')
+        if ip=="":
+            my_ip : str =socket.gethostbyname('localhost')
+        else:
+            my_ip=ip
         data_tup=(my_ip,service)
         new_node_path=self.zk.create(
             path=self.SERVICE_REGISTRY_NAMESPACE+'/'+self.ZNODE_PREFIX,
@@ -32,6 +35,7 @@ class ServiceDiscovery():
             sequence=True,
             makepath=True
         )
+        self.services=data_tup
         print('register '+ str(new_node_path))
 
     def close(self):
@@ -39,8 +43,5 @@ class ServiceDiscovery():
         self.zk.close()
 
     def get_services(self):
-        self.my_lock.acquire()
-        body_data=requests.request(method='get',url='http://'+self.services[0]+":5000")
-        self.my_lock.release()
-        return body_data
+        return self.services
 

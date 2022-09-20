@@ -3,6 +3,7 @@ import time
 
 from kazoo.client import KazooClient, KazooState
 from kazoo.protocol.states import EventType, WatchedEvent
+import  serviceDiscovery
 
 ZNODE_PREFIX = '/a_'
 
@@ -14,7 +15,7 @@ class LeaderElection():
         self.zk: KazooClient = None
         self._connect_zookeeper()
         self._leader = False
-
+        self.services=""
 
     @staticmethod
     def connection_status_listener(state):
@@ -40,6 +41,13 @@ class LeaderElection():
 
         self.elect_leader()
 
+    def service_register(self,service="worker",ip=""):
+        sd: serviceDiscovery=serviceDiscovery.ServiceDiscovery(self.zk)
+        sd.register(service,ip)
+        self.services=sd.get_services()
+
+    def get_service(self):
+        return self.services
 
     def elect_leader(self):
         print('leader_election: start')
@@ -96,6 +104,7 @@ class LeaderElection():
         for child in children:
             values.append(self.zk.get(path=path + "/" + child)[0])
         return values
+
     def set_data_self(self,term):
         self.zk.set(path=self.electionNamespace+"/"+self.znode_name,value=term.encode('utf-8'))
     def get_data_self(self):

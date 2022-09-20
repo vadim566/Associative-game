@@ -40,7 +40,7 @@ if le.is_leader():
     @app.route("/" ,methods=['get','post'])
     @app.route("/<term>", methods=['get', 'post'])
 
-    def main(term="david"):
+    def main(term="test"):
 
             # if leader
             #msg=[]

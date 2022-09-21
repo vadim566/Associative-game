@@ -1,3 +1,4 @@
+
 # This is a sample Python script.
 from os import listdir
 from os.path import join, isdir, isfile
@@ -154,17 +155,3 @@ class TF_IDF:
 
 
 
-# Press the green button in the gutter to run the script.
-
-   # print(ct_terms)
-  #  print(TF_dic)
-# #final doc score
-# def score_items(files,TF_dic,ct_terms):
-#     terms_score={}
-#     for doc in files:
-#         terms_score[doc]=0
-#         for key in TF_dic[doc]:
-#             terms_score[doc]=terms_score[doc]+TF_dic[doc][key]*ct_terms[key]
-#
-#     sorted_terms_score=sorted(terms_score,key=lambda x: x[1], reverse=False)
-#     return sorted_terms_score, terms_scoreSee PyCharm help at https://www.jetbrains.com/help/pycharm/

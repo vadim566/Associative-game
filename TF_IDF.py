@@ -96,7 +96,7 @@ class TF_IDF:
         self.terms = self.query.split()
         self.create_tf_dic()
 
-    def leader(self,TF_dics):
+    def leader(self,TF_dics:list):
 
         for d in TF_dics:
             for k, v in d.items():  # d.items() in Python 3+
@@ -119,7 +119,8 @@ class TF_IDF:
                 if value > 0:
                     ct_terms[key] = ct_terms[key] + 1
         for key, value in ct_terms.items():
-            ct_terms[key] = math.log(num_of_docs / value)
+            if value>0:
+                ct_terms[key] = math.log(num_of_docs / value)
         return ct_terms
 
     def create_tf_dic(self):

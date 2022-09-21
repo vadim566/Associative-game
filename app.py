@@ -32,15 +32,32 @@ def work_to_do(phrase,ip_sufix):
 
     return x.text
 
+def str_tuple_decode_to_tuple(tuple_str :bytes)->tuple:
+    decode=tuple_str.decode()
+    tup_data=decode[1:-1].split(",")
+    ip=tup_data[0].split("'")[1]
+    type=tup_data[1].split("'")[1]
+    return ip,type
 
+def get_service_host(master :LeaderElection):
+    connection_data = le.get_children_data("/services")
+    children_host=[]
+    for cd in connection_data:
+        child=str_tuple_decode_to_tuple(cd)
+        if child[1]=="worker":
+            children_host.append(child)
+    return children_host
 
 @app.route("/" ,methods=['get','post'])
 @app.route("/<term>", methods=['get', 'post'])
 
 def main(term="test"):
     if le.is_leader():
-        connection_data=le.get_children_data("/services")
-        return str(connection_data)
+        msg=[]
+        children_host=get_service_host(le)
+        for ch in children_host:
+            msg.append(requests.request(method='get', url="http://" + ch[0]),port=5000)
+        return msg
     else:
         return term+str(le.get_service())
 

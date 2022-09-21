@@ -43,5 +43,7 @@ class ServiceDiscovery():
         self.zk.close()
 
     def get_services(self):
-        return self.services
+        ip=self.services[0]
+        service=self.services[1]
+        return ip,service
 

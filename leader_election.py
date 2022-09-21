@@ -15,7 +15,8 @@ class LeaderElection():
         self.zk: KazooClient = None
         self._connect_zookeeper()
         self._leader = False
-        self.services=""
+        self.service=""
+        self.ip=""
 
     @staticmethod
     def connection_status_listener(state):
@@ -44,10 +45,10 @@ class LeaderElection():
     def service_register(self,service="worker",ip=""):
         sd: serviceDiscovery=serviceDiscovery.ServiceDiscovery(self.zk)
         sd.register(service,ip)
-        self.services=sd.get_services()
+        self.ip,self.service=sd.get_services()
 
     def get_service(self):
-        return self.services
+        return self.ip,self.service
 
     def elect_leader(self):
         print('leader_election: start')

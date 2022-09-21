@@ -1,10 +1,11 @@
+
 # This is a sample Python script.
 from os import listdir
 from os.path import join, isdir, isfile
 import math
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
+from collections import Counter
 
 def filesinDir(dir_path):
     try:
@@ -71,6 +72,8 @@ def IDF(files,terms,TF_dic):
 
 
 
+
+
 class TF_IDF:
     def __init__(self,bookLib,files,query):
         self.bookLib = bookLib#".\\books\\"
@@ -79,14 +82,47 @@ class TF_IDF:
         self.terms_score={}
         self.sorted_terms_score={}
         self.TF_dic={}
-        self.term=""
+        self.terms=""
         self.idf_dic={}
+
+
     def  tf_idf_scoring(self):
         self.terms = self.query.split()
         self.create_tf_dic()
         self.idf_dic = IDF(self.files, self.terms, self.TF_dic)
         self.score_items()
         self.sort_values()
+
+    def worker(self):
+        self.terms = self.query.split()
+        self.create_tf_dic()
+
+    def leader(self,TF_dics:list):
+
+        for d in TF_dics:
+            for k, v in d.items():  # d.items() in Python 3+
+                self.TF_dic.setdefault(k, []).append(v)
+
+        self.idf_dic = self.LEADER_IDF(self.files, self.TF_dic)
+        self.score_items()
+        self.sort_values()
+
+    def LEADER_IDF(self,files, TF_dic):
+        num_of_docs = len(self.TF_dic.items())
+        ct_terms = {}
+        self.terms=self.query.split()
+
+        terms=self.terms
+        for term in terms:
+            ct_terms[term] = 0
+        for k in TF_dic.keys():
+            for key, value in TF_dic[k][0].items():
+                if value > 0:
+                    ct_terms[key] = ct_terms[key] + 1
+        for key, value in ct_terms.items():
+            if value>0:
+                ct_terms[key] = math.log(num_of_docs / value)
+        return ct_terms
 
     def create_tf_dic(self):
         for f in self.files:
@@ -108,22 +144,14 @@ class TF_IDF:
             for key in self.TF_dic[doc]:
                 self.terms_score[doc]=self.terms_score[doc]+self.TF_dic[doc][key]*self.idf_dic[key]
 
+    def score_items_LEADER(self):
+        for doc in self.TF_dic.keys():
+            self.terms_score[doc] = 0
+            for key in self.TF_dic[doc][0]:
+                self.terms_score[doc] = self.terms_score[doc] + self.TF_dic[doc][0][key] * self.idf_dic[key]
+
     def sort_values(self):
         self.sorted_terms_score=sorted(self.terms_score.items(),key=lambda x: x[1], reverse=True)
 
 
 
-# Press the green button in the gutter to run the script.
-
-   # print(ct_terms)
-  #  print(TF_dic)
-# #final doc score
-# def score_items(files,TF_dic,ct_terms):
-#     terms_score={}
-#     for doc in files:
-#         terms_score[doc]=0
-#         for key in TF_dic[doc]:
-#             terms_score[doc]=terms_score[doc]+TF_dic[doc][key]*ct_terms[key]
-#
-#     sorted_terms_score=sorted(terms_score,key=lambda x: x[1], reverse=False)
-#     return sorted_terms_score, terms_scoreSee PyCharm help at https://www.jetbrains.com/help/pycharm/

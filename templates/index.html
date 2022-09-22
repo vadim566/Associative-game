@@ -21,7 +21,8 @@
     }
     async function  fetch_game()
     {
-        phrase="Alice"
+        phrase=await fetch("http://127.0.0.1:5000/").then(res=>res.json())
+
         listOfStories=[]
         listOfAnswers=[]
         body_obj=await fetch("http://127.0.0.1:5000/"+phrase).then(res=>res.json())

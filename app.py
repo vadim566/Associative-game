@@ -3,6 +3,8 @@ import threading
 import time
 import json
 from concurrent.futures import ThreadPoolExecutor
+from os.path import isdir, isfile, join
+
 from flask_cors import CORS
 
 import requests
@@ -36,6 +38,24 @@ test_dics = []
 hostname=""
 
 
+# returning a list with files in dir_path
+def filesinDir(dir_path):
+    try:
+        files_in_dir = [f for f in os.listdir(dir_path) if isfile(join(dir_path, f))]
+    except:
+        "something wrong with the directory, put in the full path"
+    finally:
+        return files_in_dir
+
+
+# returning a list with sub dir to dir_path
+def dirinDir(dir_path):
+    try:
+        dir_in_dir = [f for f in os.listdir(dir_path) if isdir(join(dir_path, f))]
+    except:
+        "something wrong with the directory, put in the full path"
+    finally:
+        return dir_in_dir
 
 def work_to_do(phrase,ip_sufix):
     x=int(hostname[-1])
@@ -78,6 +98,34 @@ def make_request_to_worker(children_host :list,query:str,sub_folder:int):
 
 
 @app.route("/" ,methods=['get','post'])
+def get_random_phrase():
+    words = []
+    while len(words) < 4:
+        num_folder=random.randint(0,len(sub_folder)-1)
+        fldr = bookLib + sub_folder[num_folder]
+        num_files_in_dir=len(filesinDir(fldr))
+        num_story=random.randint(0,num_files_in_dir-1)
+        name_of_story=filesinDir(fldr)[num_story]
+        read_file = open(fldr + name_of_story, 'r')
+
+        Lines = read_file.readlines()
+        num_of_line=random.randint(0,len(Lines))
+        line_txt=Lines[num_of_line]
+        line_len=len(line_txt)
+        words = line_txt.split(',')
+    read_file.close()
+    num_of_words=len(words)
+    rnd_num=random.randint(0, num_of_words)
+
+    return jsonify(words[rnd_num])
+
+
+
+
+
+
+
+
 @app.route("/<query>", methods=['get', 'post'])
 
 def main(query):

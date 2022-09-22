@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Play Distributed Games</title>
+
+</head>
+
+<body>
+<div class="gameCard">
+    <div class="bp3-card">
+        <button class="bp3-button" onclick="fetch_game()" >play game</button>
+	 <div class="game_content"></div>
+    </div>
+<script>
+    async function  fetch_game()
+    {
+        listOfStories=[]
+        listOfAnswers=[]
+        body_obj=await fetch("http://127.0.0.1:5000/Alice").then(res=>res.json())
+        for (let key in body_obj)
+        {
+
+            listOfStories.push(key)
+            listOfAnswers.push(value=(key,body_obj[key]))
+
+        }
+
+        document.getElementsByClassName("game_content")[0].innerHTML='<p>'+listOfStories+'/p'+
+            "<p>"+listOfAnswers+"</p>"
+    }
+
+</script>
+</div>
+</body>
+</html>

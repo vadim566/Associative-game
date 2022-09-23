@@ -1,49 +1,105 @@
-# Distributed System:Story visualization with image search engine
+
+# Association Game based TF-IDF Algorithem[MVP version]
+
+This system will generate Phrase and will give you
+4 stories that were ran up in the TF-IDF search Algorithem.
+The user will get the score based on the answer precantage it 
+got in the IDF-TF.
+
+## Use case
+![App Screenshot](https://i.ibb.co/wBVMc7m/UseCase.jpg)
+
+## UML
+![App Screenshot](https://i.ibb.co/54jM8PY/UML.png)
+
+## Features
+
+- The algo of TF-IDF is Disterbuted on zookeeper
+- Based Flask
+- Cross platform
 
 
-by David Musaev and Niv Dadush
+## Installation
 
-# Motivation
-Attaching image to many phrase to create more easy readable text
-# Roadmap
-#### 1 : Creating/Using  Google Image Scrapper for Scrapping image by phrase
-#### 2 : Creating/Using IDF-TF Image Search by term
-#### 3 : Creating Flask WebPage with Browser div and Story div
+Install Zookeeper-
+https://zookeeper.apache.org/
+
+#### 1. Configure the server to:  localhost:2181
+#### 2. Define how many workers will run with the system
+#### 3. Under ./book/ create sub folder same number as #workers
+#### 4. Recomanded that each folder will have sequential name 
+#### 5. Spread Documents between all subfolder, at least one in each folder
+#### 6. Create venv Install all python modules into venv
+```shell
+python -m venv venv
+```
+```
+.\venv\Scripts\activate.bat
+```
+```
+pip install -r requirements.txt
+```
+
+## Deployment
+
+#### 1. Make sure that Zookeeper is running , o.w it won't work
+#### 2. Run app.py as the number of the subfolder in  differnet cmd/bash instance
+
+```bash
+.\venv\Scripts>activate.bat
+python .\app.py
+```
+
+#### 3. Run FrontGateApp.py as front end server that will create api request to leader at http://127.0.0.1:5000 
+
+```bash
+.\venv\Scripts>activate.bat
+python .\FrontGateApp.py
+```
+## API Reference
+
+#### Tf-IDF game generator
+
+```http
+  GET 127.0.0.1:5000/{phrase}
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `phrase` | `string` | **Required**. Phrase to run on it IDF-TF |
+
+
+#### Generate Phrase
+
+```http
+  GET 127.0.0.1:5000/
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `phrase` | `string` | **Required**. Phrase generator |
+
+#### Make worker run TF on phrase
+
+```http
+  GET 127.0.0.{worker_number+1}:5000/{phrase}/{subfolder}
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `worker_number+1` | `int` | **Required**. worker index ip |
+| `phrase`      | `string` | **Required**. The phrase for TF run |
+| `subfolder` | `int` | **Required**. Index of subfolder also matched to number of worker|
 
 
 
-## Usage
-
-### turn this
-Glinda, the good Sorceress of Oz, sat in the grand court of her
-palace, surrounded by her maids of honor--a hundred of the most
-beautiful girls of the Fairyland of Oz. The palace court was built of
-rare marbles, exquisitely polished.
-
-### into this
 
 
+## Screenshots
 
-
-![alt text](https://i.postimg.cc/FswBBDTn/Glindathegood-Sorceressof-Ozsatinthegrandcourtofher0.jpg)
-Glinda, the good Sorceress of Oz, sat in the grand court of her
-![alt text](https://i.postimg.cc/j5qg79jC/palacesurroundedbyhermaidsofhonorahundredofthemost0.jpg)
-palace, surrounded by her maids of honor--a hundred of the most
-![alt text](https://i.postimg.cc/bvhFzdcx/Thepalacecourtwasbuiltofraremarbles0.jpg)
-beautiful girls of the Fairyland of Oz. The palace court was built of
-![alt text](https://i.postimg.cc/Gpxg9rdZ/Thepalacecourtwasbuiltofraremarblesexquisitelypolished0.png)
-rare marbles, exquisitely polished.
-
-
-## architecture and use case
-[![Architercture.png](https://i.postimg.cc/PxhWp824/Architercture.png)](https://postimg.cc/4KL7jnC7)
-### Case 1: The user will request to visualize a story from story list and it will processed by Master-Worker Zookeeper topology and will returned as visualized story
-### Case 2: The user will search an image and the request will be processed by master search of IDF-TF algorithms 
-
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
-
-## License
-[MIT](https://choosealicense.com/licenses/mit/)
+## initial
+![App Screenshot](https://i.ibb.co/RzZmT3b/sc1.png)
+## Less Signifcant score answer 
+![App Screenshot](https://i.ibb.co/3FKchdH/sc2.png)
+## Most Signifcant score answer
+![App Screenshot](https://i.ibb.co/Xp2tBpq/sc3.png)

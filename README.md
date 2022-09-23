@@ -6,18 +6,29 @@ This system will generate Phrase and will give you
 The user will get the score based on the answer precantage it 
 got in the IDF-TF.
 
-## Use case
+## Use case/Sequence diagram
+User will aproach the the front end  and request a Game,
+after proccessing the phrase it will return phrase with 4 answers based on idf-tf Algorithem
 ![App Screenshot](https://i.ibb.co/wBVMc7m/UseCase.jpg)
 
 ## UML
+When initlize the flask server it will be elected as a leader or worker,
+if it was elected worker it will register its self as a leader in service discovery,
+while its mention its ip.
+After a get request from front end the request will passed to leader for genrate a phrase and 
+it will generate a search based IDF-TF while the TF is distrebuted between all workers,
+each worker return the TF result and the leader agrigating it into IDF Score and returning a JSON that 
+hold the whole information for fatching the front end
 ![App Screenshot](https://i.ibb.co/54jM8PY/UML.png)
 
 ## Features
-
+MVP
 - The algo of TF-IDF is Disterbuted on zookeeper
 - Based Flask
 - Cross platform
-
+Future Features
+-picture that will be attached to each phrase
+-cached picture based eachs story that will be searched by terms
 
 ## Installation
 
@@ -103,3 +114,5 @@ python .\FrontGateApp.py
 ![App Screenshot](https://i.ibb.co/3FKchdH/sc2.png)
 ## Most Signifcant score answer
 ![App Screenshot](https://i.ibb.co/Xp2tBpq/sc3.png)
+
+

@@ -126,7 +126,7 @@ class TF_IDF:
 
     def create_tf_dic(self):
         for f in self.files:
-            file_name = self.bookLib + f
+            file_name = self.bookLib+'\\' + f
             self.TF_dic[f] = TF(file_name, self.terms)
     def pracentage_score(self):
         sum_list=sum(self.terms_score.values())

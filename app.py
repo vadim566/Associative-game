@@ -15,28 +15,6 @@ import os
 
 
 
-app = Flask(__name__)
-CORS(app, support_credentials=True)
-lock=threading.RLock()
-#answer = LeaderElection('localhost:2181', 'Term', '/TF-IDF')
-
-le = LeaderElection('localhost:2181', 'Leader', '/election')
-le.register()
-
-#tfIDF
-sub_folder = ['a\\', 'b\\', 'c\\']
-bookLib = ".\\books\\"
-# files = TF_IDF.filesinDir(".\\books\\")
-#query = 'bell'
-#test_query = []
-
-test_dics = []
-
-# leader
-
-
-hostname=""
-
 
 # returning a list with files in dir_path
 def filesinDir(dir_path):
@@ -56,6 +34,33 @@ def dirinDir(dir_path):
         "something wrong with the directory, put in the full path"
     finally:
         return dir_in_dir
+
+
+
+app = Flask(__name__)
+CORS(app, support_credentials=True)
+lock=threading.RLock()
+#answer = LeaderElection('localhost:2181', 'Term', '/TF-IDF')
+
+le = LeaderElection('localhost:2181', 'Leader', '/election')
+le.register()
+
+#tfIDF
+bookLib = ".\\books\\"
+sub_folder = dirinDir(bookLib)
+
+# files = TF_IDF.filesinDir(".\\books\\")
+#query = 'bell'
+#test_query = []
+
+test_dics = []
+
+# leader
+
+
+hostname=""
+
+
 
 def work_to_do(phrase,ip_sufix):
     x=int(hostname[-1])
@@ -106,7 +111,7 @@ def get_random_phrase():
         num_files_in_dir=len(filesinDir(fldr))
         num_story=random.randint(0,num_files_in_dir-1)
         name_of_story=filesinDir(fldr)[num_story]
-        read_file = open(fldr + name_of_story, 'r')
+        read_file = open(fldr+'\\' + name_of_story, 'r')
 
         Lines = read_file.readlines()
         num_of_line=random.randint(0,len(Lines))
@@ -182,7 +187,7 @@ def worker_request(query : str,subfolder :int):
    # test_dics = []
     i = subfolder
     test_query.append(TF_IDF.TF_IDF(bookLib=str(bookLib) + str(sub_folder[i]),
-                                    files=TF_IDF.filesinDir(str(bookLib) + str(sub_folder[i])), query=query))
+                                    files=TF_IDF.filesinDir(str(bookLib) + str(sub_folder[i])+'\\'), query=query))
     test_query[0].worker()
     json_msg = json.dumps(test_query[0].TF_dic)
     return json_msg

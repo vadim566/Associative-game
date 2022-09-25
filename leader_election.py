@@ -57,6 +57,7 @@ class LeaderElection():
         if sorted_children[0] == self.znode_name:
             self._leader = True
             print("LEADER: " + self.nodeName + '(znode: ' + self.znode_name + ')')
+            self.become_master("/services")
         else:
             print("Follower: " + '(znode: ' + self.znode_name + ')')
             predecessor_index = sorted_children.index(self.znode_name) -1
@@ -74,6 +75,7 @@ class LeaderElection():
                     if event.type == EventType.DELETED:
                         print("Event is " + str(event))
                         self.elect_leader()
+
 
     def clean_zookeeper(self,path=""):
         if(path==""):
@@ -108,11 +110,27 @@ class LeaderElection():
 
     def set_data_self(self,term):
         self.zk.set(path=self.electionNamespace+"/"+self.znode_name,value=term.encode('utf-8'))
+
+    def become_master(self,dir_path):
+        services_children=self.zk.get_children(path=dir_path)
+        for child in services_children:
+            child_ip=self.str_tuple_decode_to_tuple(self.zk.get(dir_path +'/' +child)[0])[0]
+            if child_ip==self.ip:
+                self.zk.set(path=dir_path + "/" + child, value=(self.ip,'master').__repr__().encode())
+                return
+
+
+
     def get_data_self(self):
         value=self.zk.get(path=self.electionNamespace+"/"+self.znode_name)
         return  value
 
-
+    def str_tuple_decode_to_tuple(self,tuple_str: bytes) -> tuple:
+        decode = tuple_str.decode()
+        tup_data = decode[1:-1].split(",")
+        ip = tup_data[0].split("'")[1]
+        type = tup_data[1].split("'")[1]
+        return ip, type
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:

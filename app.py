@@ -105,7 +105,7 @@ def make_request_to_worker(children_host :list,query:str,sub_folder:int):
 @app.route("/" ,methods=['get','post'])
 def get_random_phrase():
     words = []
-    while len(words) < 4:
+    while len(words) < 12  :
         num_folder=random.randint(0,len(sub_folder)-1)
         fldr = bookLib + sub_folder[num_folder]
         num_files_in_dir=len(filesinDir(fldr))
@@ -117,12 +117,13 @@ def get_random_phrase():
         num_of_line=random.randint(0,len(Lines))
         line_txt=Lines[num_of_line]
         line_len=len(line_txt)
-        words = line_txt.split(',')
+        words = line_txt.split()
     read_file.close()
     num_of_words=len(words)
-    rnd_num=random.randint(0, num_of_words)
+    rnd_num=random.randint(0, num_of_words-5)
+    words_to_front=[words[rnd_num],words[rnd_num+1],words[rnd_num+2],words[rnd_num+3],words[rnd_num+4]]
 
-    return jsonify(words[rnd_num])
+    return jsonify(" ".join(words_to_front))
 
 
 

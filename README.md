@@ -62,7 +62,7 @@ python .\app.py
 ```
 
 #### 3. Run FrontGateApp.py as front end server that will create api request to leader at http://127.0.0.1:5000 
-!! caution makesure the default ip of FrontGateApp is 127.0.0.10 , its mean that if you have more then 10 subfolder , you will have to run 10 workers and one of them will hold http://127.0.0.10:5000, you will have to change the GrontGateapp ip to other ip that free. 
+!! caution makesure the default ip of FrontGateApp is 127.0.0.10 , its mean that if you have more then 10 subfolder , you will have to run 10 workers and one of them will hold http://127.0.0.10:5000, you will have to change the FrontGateapp ip to other ip that free. 
 
 ```bash
 .\venv\Scripts>activate.bat

@@ -7,8 +7,10 @@ The user will get the score based on the answer precantage it
 got in the IDF-TF.
 
 ## Use case/Sequence diagram
-User will aproach the the front end  and request a Game,
+1.User will aproach the the front end  and request a Game,
 after proccessing the phrase it will return phrase with 4 answers based on idf-tf Algorithem
+2.If the main Server was down the zookeeper will create a new leader that will recive all new request
+3.The TF part of the IDF-TF is distrebuted between workers by simpale hashing.
 ![App Screenshot](https://i.ibb.co/wBVMc7m/UseCase.jpg)
 
 ## UML

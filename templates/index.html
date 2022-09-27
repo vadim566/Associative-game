@@ -21,11 +21,12 @@
     }
     async function  fetch_game()
     {
-        phrase=await fetch("http://{{main_server|safe}}:5000/").then(res=>res.json())
+        mainServer=await fetch("http://127.0.0.10:5000/get_master_req").then(res=>res.json())
+        phrase=await fetch("http://"+mainServer+":5000/").then(res=>res.json())
 
         listOfStories=[]
         listOfAnswers=[]
-        body_obj=await fetch("http://{{main_server|safe}}:5000/"+phrase).then(res=>res.json())
+        body_obj=await fetch("http://"+mainServer+":5000/"+phrase).then(res=>res.json())
         for (let key in body_obj)
         {
 

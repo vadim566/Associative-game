@@ -17,7 +17,7 @@ class LeaderElection():
         self._leader = False
         self.service=""
         self.ip=""
-
+        self.sd=""
     @staticmethod
     def connection_status_listener(state):
         if state == KazooState.LOST:
@@ -45,6 +45,9 @@ class LeaderElection():
     def service_register(self,service="worker",ip=""):
         sd: serviceDiscovery=serviceDiscovery.ServiceDiscovery(self.zk)
         sd.register(service,ip)
+        self.sd=sd
+        if service=="master":
+            self.sd.get_worker_discover()
         self.ip,self.service=sd.get_services()
 
     def get_service(self):
@@ -57,7 +60,8 @@ class LeaderElection():
         if sorted_children[0] == self.znode_name:
             self._leader = True
             print("LEADER: " + self.nodeName + '(znode: ' + self.znode_name + ')')
-            self.become_master("/services")
+            self.become_master('/services/')
+
         else:
             print("Follower: " + '(znode: ' + self.znode_name + ')')
             predecessor_index = sorted_children.index(self.znode_name) -1
@@ -117,7 +121,17 @@ class LeaderElection():
             child_ip=self.str_tuple_decode_to_tuple(self.zk.get(dir_path +'/' +child)[0])[0]
             if child_ip==self.ip:
                 self.zk.set(path=dir_path + "/" + child, value=(self.ip,'master').__repr__().encode())
+                if not self.sd == "":
+                    self.sd.get_worker_discover()
                 return
+
+    def register_master(self):
+        if not self.sd=="":
+            self.sd.close()
+        sd: serviceDiscovery = serviceDiscovery.ServiceDiscovery(self.zk)
+        sd.register(self.service, self.ip)
+        sd.get_worker_discover()
+        self.sd=sd
 
 
 
@@ -133,21 +147,18 @@ class LeaderElection():
         return ip, type
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print('use leader_election.py <appName>')
-        exit(-1)
-    appName = sys.argv[1]
-    leaderElection: LeaderElection = LeaderElection('localhost:2181', appName, '/election')
+    appName='test'
+    le = LeaderElection('localhost:2181', appName, '/election')
     #leaderElection.clean_zookeeper()
 
-    leaderElection.register()
+    le.register()
 
     try:
         time.sleep(300)
     finally:
         print('\n node interrupted')
-        leaderElection.zk.stop()
-        leaderElection.zk.close()
+        le.zk.stop()
+        le.zk.close()
         print('\n node is dead')
 
 

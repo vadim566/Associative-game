@@ -61,16 +61,6 @@ test_dics = []
 hostname=""
 
 
-
-def work_to_do(phrase,ip_sufix):
-    x=int(hostname[-1])
-    x=str(x+ip_sufix+1)
-    address = hostname[:-1]+str(x)+":5000"+"/"+phrase
-
-    x=requests.request(method='get',url="http://"+address)
-
-    return x.text
-
 def str_tuple_decode_to_tuple(tuple_str :bytes)->tuple:
     decode=tuple_str.decode()
     tup_data=decode[1:-1].split(",")
@@ -93,7 +83,7 @@ def make_request_to_worker(children_host :list,query:str,sub_folder:int):
     #test_dics=[]
     ch=children_host
 
-    msg = json.loads(requests.request(method='get', url="http://" + ch[0] + ":5000/"+query+"/"+str(sub_folder)).text)
+    msg = json.loads(requests.request(method='get', url="http://" + ch + ":5000/"+query+"/"+str(sub_folder)).text)
     global lock
     lock.acquire()
     test_dics.append(msg)
@@ -139,7 +129,7 @@ def main(query):
         global test_dics
         test_dics=[]
         msg=[]
-        children_host=get_service_host(le)
+        children_host=le.sd.workers_ip
         pool = ThreadPoolExecutor(max_workers=len(children_host)+1)
         #i=0
        # for ch in children_host:
@@ -150,7 +140,7 @@ def main(query):
 
         threads=[]
         for i in range(len(sub_folder)):
-         worker_thread=threading.Thread(target=make_request_to_worker,args=(children_host[i],query,i))
+         worker_thread=threading.Thread(target=make_request_to_worker,args=(children_host[i%len(children_host)],query,i))
          worker_thread.start()
          threads.append(worker_thread)
         for w in threads:

@@ -19,6 +19,11 @@ def get_master():
     server_ip = le.str_tuple_decode_to_tuple(main_server)[0]
     return server_ip
 
+@app.route('/get_master_req',methods=['get','post'])
+def get_master_req():
+    server_ip=get_master()
+    return jsonify(server_ip)
+
 @app.route('/favicon.ico', methods=['get','post'])
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
